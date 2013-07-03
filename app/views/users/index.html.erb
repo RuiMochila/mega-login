@@ -1,4 +1,4 @@
-<div class="container hero-unit">
+<div class="container">
 	<div class="row">
 		<div class="pull-left span6">
 			<% if signed_in? %>
@@ -6,20 +6,20 @@
 				Your social links:
 				
 				<% if current_user.link('facebook').nil? %>
-					<p>Link your Facebook <%=link_to(image_tag("facebook_64.png"), "/auth/facebook", :class=>"") %> </p>
+					<p><%=link_to("Link your Facebook", "/auth/facebook", :class=>"zocial facebook") %> </p>
 				<% else %>
 					Your Facebook Accout: <%= current_user.link('facebook').uid %>
 				<% end %>
 				<br>
 				<% if current_user.link('google_oauth2').nil? %>
-					<p>Link your Google <%=link_to(image_tag("google_64.png"), "/auth/google_oauth2", :class=>"") %> </p>
+					<p><%=link_to("Link your Google", "/auth/google_oauth2", :class=>"zocial googleplus") %> </p>
 				<% else %>
 					Your Google Accout: <%= current_user.link('google_oauth2').uid %>
 				<% end %>
 				<br>
 			<% else %>
-				<p>Login Facebook<%=link_to(image_tag("facebook_64.png"), "/auth/facebook", :class=>"") %> </p>
-				<p>Login Google<%=link_to(image_tag("google_64.png"), "/auth/google_oauth2", :class=>"") %> </p>
+				<p><%=link_to("Login Facebook", "/auth/facebook", :class=>"zocial facebook") %> </p>
+				<p><%=link_to("Login your Google", "/auth/google_oauth2", :class=>"zocial googleplus") %> </p>
 				<p><%=link_to("Login Regular", "login", :class=>"btn") %></p>
 				
 				<p><%=link_to("Registo Regular", "signup", :class=>"btn") %></p>	
