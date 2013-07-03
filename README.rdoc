@@ -1,0 +1,7 @@
+== Welcome to Mega-Login
+
+Este é um projecto onde eu implemento um sistema de login e registo com diferentes providers via omniauth, e registo regular via identity. Com a criação de várias authentications de user.
+
+Inclui features de reset password e remember me.
+
+Precisa de mais algumas coisas mas é um projecto de referência que vai evoluir.

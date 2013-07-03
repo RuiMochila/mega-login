@@ -1,0 +1,8 @@
+<form method='post' action='/auth/identity/callback' noValidate='noValidate'  class="form-signin">
+	<h2 class="form-signin-heading">Please Login</h2>
+	<input type='text' id='auth_key' name='auth_key' class="input-block-level" placeholder="Email address"/>
+	<input type='password' id='password' name='password' class="input-block-level" placeholder="Password"/>
+	<button type='/submit' class="btn btn-large btn-primary" name="Login">Login</button>
+	<p><a href='signup'>Create an Identity</a> | <%= link_to "forgotten password?", new_password_reset_path %></p>
+
+</form>

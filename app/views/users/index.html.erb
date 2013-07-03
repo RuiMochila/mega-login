@@ -1,0 +1,62 @@
+<div class="container hero-unit">
+	<div class="row">
+		<div class="pull-left span6">
+			<% if signed_in? %>
+				<p><%=link_to("Logout", "logout", :class=>"btn") %></p>
+				Your social links:
+				
+				<% if current_user.link('facebook').nil? %>
+					<p>Link your Facebook <%=link_to(image_tag("facebook_64.png"), "/auth/facebook", :class=>"") %> </p>
+				<% else %>
+					Your Facebook Accout: <%= current_user.link('facebook').uid %>
+				<% end %>
+				<br>
+				<% if current_user.link('google_oauth2').nil? %>
+					<p>Link your Google <%=link_to(image_tag("google_64.png"), "/auth/google_oauth2", :class=>"") %> </p>
+				<% else %>
+					Your Google Accout: <%= current_user.link('google_oauth2').uid %>
+				<% end %>
+				<br>
+			<% else %>
+				<p>Login Facebook<%=link_to(image_tag("facebook_64.png"), "/auth/facebook", :class=>"") %> </p>
+				<p>Login Google<%=link_to(image_tag("google_64.png"), "/auth/google_oauth2", :class=>"") %> </p>
+				<p><%=link_to("Login Regular", "login", :class=>"btn") %></p>
+				
+				<p><%=link_to("Registo Regular", "signup", :class=>"btn") %></p>	
+			<% end %>
+
+
+		</div>
+
+		<div class="pull-right span4">
+			<p>The User Currently Loged in is : </p>
+			<% if signed_in? %>
+			  <%= current_user.id %>
+			  <%= current_user.name %>
+			  <%= current_user.email %>
+			<% else %>
+			  Ninguém
+			<% end %>
+		</div>
+	</div>
+
+	<div class="row">
+		<div>
+			Users and Authentications:
+			<ul>
+			<% @users.each do |user| %>
+			  <li>
+				<%= user.inspect %>
+				<ul>
+				  <% user.authentications.each do |auth| %>
+				    <li>
+					  <%= auth.inspect %>
+					</li>
+				  <% end %>
+				</ul>
+			  </li>	
+			<% end %>
+			</ul>
+		</div>
+	</div>
+</div>
