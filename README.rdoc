@@ -5,3 +5,17 @@ Este é um projecto onde eu implemento um sistema de login e registo com diferen
 Inclui features de reset password e remember me.
 
 Precisa de mais algumas coisas mas é um projecto de referência que vai evoluir.
+
+Para meter este projecto a funcionar tem de se configurar o ficheiro omniauth.rb nos initializers com as chaves dos providers que pretendemos.
+
+Para login facebook registar aqui:
+https://developers.facebook.com/apps
+
+Criar uma nova app, dizer que se quer login e inicialmente colocar como redirect o http://localhost:3000/
+
+Para login google registar aqui:
+https://code.google.com/apis/console/
+
+Create Project, Request OAuth2 Credencials.
+N esquecer de configurar o redirect url para:
+http://localhost:3000/auth/google_oauth2/callback
