@@ -26,3 +26,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   # provider :linked_in, 'CONSUMER_KEY', 'CONSUMER_SECRET'
   provider :google_oauth2, ENV['KEY'], ENV['SECRET']
 end
+
+OmniAuth.config.on_failure = Proc.new { |env|
+  OmniAuth::FailureEndpoint.new(env).redirect_to_failure
+}

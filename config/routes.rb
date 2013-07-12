@@ -6,6 +6,7 @@ MegaLogin::Application.routes.draw do
   #post /auth/identity/register - Registo 
   # mas o get bloqueio para nunca verem o for  de dentro da gem e assim consigo passar a lógica pelo meu controller
   # get "/auth/identity/register", to: "users#new"
+  get "/auth/failure" => "sessions#new"
   get "/auth/identity/register" => "users#new"
   match '/auth/:provider/callback', to: 'sessions#create' #omniauth route
   match '/signup', to: 'users#new'
