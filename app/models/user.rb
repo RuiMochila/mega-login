@@ -45,6 +45,7 @@ class User < OmniAuth::Identity::Models::ActiveRecord
     	puts "CHEGOU AO IDENTITY"
     	#N é por aqui que ele cria quando é identity, n chega aqui nunca.
     else
+      uts "CHEGOU AO default"
     	'default'
     end
     # IMPORTANT: when you're creating a user from a strategy that

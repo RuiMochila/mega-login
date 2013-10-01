@@ -23,12 +23,12 @@ class Authentication < ActiveRecord::Base
  
   def self.create_with_omniauth(auth)
   	case auth['provider']
-    when 'facebook'
-    	create(uid: auth['uid'], provider: auth['provider'], email: auth['info']['email'])
-    when 'google_oauth2'
-    	create(uid: auth['uid'], provider: auth['provider'], email: auth['info']['email'])
-    else
-    	create(uid: auth['uid'], provider: auth['provider'])
+      when 'facebook'
+      	create(uid: auth['uid'], provider: auth['provider'], email: auth['info']['email'])
+      when 'google_oauth2'
+      	create(uid: auth['uid'], provider: auth['provider'], email: auth['info']['email'])
+      else
+      	create(uid: auth['uid'], provider: auth['provider'])
     end
      # and other data you might want from the auth hash
   end

@@ -1,6 +1,7 @@
 module OmniAuth
   module Strategies
-   class Identity
+   class Identity 
+  
    	 # Override registration link 
    	 def registration_form
    	 	redirect '/signup'
@@ -19,12 +20,12 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   	model: User, 
   	on_failed_registration: lambda { |env| UsersController.action(:new).call(env) },
   	form: lambda { |env| SessionsController.action(:new).call(env) } 
-  # provider :twitter, 'CONSUMER_KEY', 'CONSUMER_SECRET'
-  provider :facebook, ENV['KEY'], ENV['SECRET'],
-           :scope => 'publish_actions,email'#, :display => 'popup' # Publish actions é para publicar em nome do user
-           # :scope => 'email,read_stream'
-  # provider :linked_in, 'CONSUMER_KEY', 'CONSUMER_SECRET'
-  provider :google_oauth2, ENV['KEY'], ENV['SECRET']
+    # provider :twitter, 'CONSUMER_KEY', 'CONSUMER_SECRET'
+    provider :facebook, ENV['KEY'], ENV['SECRET'],
+             :scope => 'publish_actions,email'#, :display => 'popup' # Publish actions é para publicar em nome do user
+             # :scope => 'email,read_stream'
+    # provider :linked_in, 'CONSUMER_KEY', 'CONSUMER_SECRET'
+    provider :google_oauth2, ENV['KEY'], ENV['SECRET']
 end
 
 OmniAuth.config.on_failure = Proc.new { |env|

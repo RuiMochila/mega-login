@@ -74,7 +74,7 @@ class SessionsController < ApplicationController
           # é aqui que devo alterar o boolean assim.
           # Este é o cenário em que n existe nimguém logado.
           u.has_identity = true
-          u.save!
+          u.save
           puts "METI O HAS IDENTITY A TRUE"
         else
           puts "PROVIDER N E IDENTITY. CRIAR USER COM AUTH HASH\n #{auth}"
