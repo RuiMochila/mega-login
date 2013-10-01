@@ -1,21 +1,28 @@
 class SessionsController < ApplicationController  
   skip_before_filter :verify_authenticity_token, only: :create
-  before_filter :double_identity, only: :create
+  # before_filter :double_identity, only: :create
  
   def new
     # Stuff to display on the login-page.
   end
   
+  respond_to :json, :html, :js
+  # respond_to :json
   def create
+    puts "PARAMS #{params}"
     auth = request.env['omniauth.auth']
     puts "AUTH RECEIVED #{auth}"
     # Find an authentication or create an authentication
     # find_by provider e uid.
+    already_exists = false
     @authentication = Authentication.find_with_omniauth(auth)
     if @authentication.nil?
-      puts "AUTHENTICATION NIL"
+      puts "AUTHENTICATION NIL".red
       # If no authentication was found, create a brand new one here
       @authentication = Authentication.create_with_omniauth(auth)
+    else
+      puts "AUTHENTICATION ALREADY EXISTS".red
+      already_exists = true
     end
  
     if signed_in?
@@ -27,7 +34,12 @@ class SessionsController < ApplicationController
         # is the current user. So the authentication is already associated with 
         # this user. So let's display an error message.
         flash[:notive] = "You have already linked this account"
-        redirect_to root_path
+
+        # redirect_back_or root_path #alterei
+        respond_to do |format|
+          format.html { redirect_back_or root_path }
+          format.json { render json: current_user }
+        end
       else
         puts "AUTHENTICATION USER NOT == CURRENT USER"
         #SE REGISTAR COM IDENTITY E ESTOU LOGADO JUNTA AQUI... 
@@ -38,14 +50,25 @@ class SessionsController < ApplicationController
         # Este cenário, ainda pode ser melhorado aqui, 
         # mas é para quando está logado com outro provider e realiza registo com identity
         # confirma depois de o login ser bem efectuado aquando login fb
-        @authentication.user = current_user
-        if auth['provider']=='identity'
-          current_user.has_identity = true
-          puts "METI O HAS IDENTITY A TRUE"
+
+        if !already_exists
+          @authentication.user = current_user
+          if auth['provider']=='identity'
+            current_user.has_identity = true
+            puts "METI O HAS IDENTITY A TRUE"
+          end
+          @authentication.save
+          flash[:notive] = "Account successfully authenticated"
+        else
+          flash[:notive] = "Account already associated with another user"
         end
-        @authentication.save
-        flash[:notive] = "Account successfully authenticated"
-        redirect_to root_path
+        respond_to do |format|
+          #redirect back ás vezes é um problema, para protected post actions, depois tenta get
+          #tou na ideia k já tinha tratado disto algures para paypal, vê o simplestarter
+          format.html { redirect_back_or root_path } 
+
+          format.json { render json: @authentication.user }
+        end
       end
     else # no user is signed_in
       puts "NO USER IS SIGNED IN"
@@ -54,8 +77,27 @@ class SessionsController < ApplicationController
         # The authentication we found had a user associated with it so let's 
         # just log them in here
         sign_in(@authentication.user)
+        puts "ITS signed in?: #{signed_in?}"
         flash[:notive] = "Signed in!"
-        redirect_to root_path
+        # redirect_back_or root_path #alterei
+
+        # response.headers['CONTENT_TYPE'] = 'application/json'
+        
+        respond_to do |format|
+          # puts "FORMAT #{format.inspect}"
+          format.js { render js: "<script> JSON.stringify(#{@authentication.user}) </script>" }
+          format.html { redirect_back_or root_path }
+          format.json { 
+            user = @authentication.user
+            token = user.generate_auth_token
+            render :json => {
+              :success => true, 
+              :user=> user,
+              :auth_token => token 
+            }
+          }#'{"user":"#{@authentication.user.name}"}' }#@authentication.user }
+          # format.json { render json: @authentication.user }
+        end
       else
         puts "THE AUTHENTICATION HAS NO USER ASSOCIATED WITH IT"
         # O login facebook n resulta no login efectivo porque esta associação ainda n existe.
@@ -74,7 +116,7 @@ class SessionsController < ApplicationController
           # é aqui que devo alterar o boolean assim.
           # Este é o cenário em que n existe nimguém logado.
           u.has_identity = true
-          u.save
+          u.save!
           puts "METI O HAS IDENTITY A TRUE"
         else
           puts "PROVIDER N E IDENTITY. CRIAR USER COM AUTH HASH\n #{auth}"
@@ -94,37 +136,58 @@ class SessionsController < ApplicationController
           puts "NOT SIGNED IN"
         end
         flash[:notive] = "Welcome to The app!"
-        case auth['provider']
-        when 'facebook'
-          token = u.generate_token_inner(:password_reset_token)
-          puts "TOKEN #{token}"
-          redirect_to edit_password_reset_url(token)
-        when 'google_oauth2'
-          token = u.generate_token_inner(:password_reset_token)
-          puts "TOKEN #{token}"
-          redirect_to edit_password_reset_url(token)
-        else
-          redirect_to root_path
+        # case auth['provider']
+        # when 'facebook'
+        #   token = u.generate_token_inner(:password_reset_token)
+        #   puts "TOKEN #{token}"
+        #   redirect_to edit_password_reset_url(token)
+        # when 'google_oauth2'
+        #   token = u.generate_token_inner(:password_reset_token)
+        #   puts "TOKEN #{token}"
+        #   redirect_to edit_password_reset_url(token)
+        # else
+        #   redirect_back_or root_path
+        # end
+        # redirect_back_or root_path #alterei
+        respond_to do |format|
+          format.html { redirect_back_or root_path }
+          format.json { render json: true }
         end
         # Se for outro provider que n identity tenho de gerar password e redirect
       end
     end
   end
   
+
   def destroy
     sign_out
     flash[:notive] = "Signed out!"
-    redirect_to root_path
+    respond_to do |format|
+          format.html { redirect_to root_path }
+          format.json { render json: true }
+    end
   end
   
   def failure
     flash[:alert] = "Authentication failed, please try again."   
-    redirect_to root_path
+    puts "IDENTITY LOGIN FAILURE"
+    # redirect_to root_path
+    respond_to do |format|
+      format.html { redirect_to root_path }
+      format.json { render json: false }
+    end
   end
 
+
   def double_identity
+    puts "REQUEST ENV #{request.env['omniauth.auth']}"
+    puts ""
     if request.env['omniauth.auth']['provider']=='identity' and signed_in? and current_user.has_identity?
-      redirect_to root_url 
+      # redirect_to root_url 
+      respond_to do |format|
+          format.html { redirect_to root_url }
+          format.json { render json: false }
+      end
     end
     #se auth provider == identity and 
     #signed_in and curent_user has onde identity already ->false
