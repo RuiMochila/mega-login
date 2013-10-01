@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController  
   skip_before_filter :verify_authenticity_token, only: :create
-  # before_filter :double_identity, only: :create
+  before_filter :dont_relogin, only: :new
  
   def new
     # Stuff to display on the login-page.
@@ -17,11 +17,11 @@ class SessionsController < ApplicationController
     already_exists = false
     @authentication = Authentication.find_with_omniauth(auth)
     if @authentication.nil?
-      puts "AUTHENTICATION NIL".red
+      puts "AUTHENTICATION NIL"
       # If no authentication was found, create a brand new one here
       @authentication = Authentication.create_with_omniauth(auth)
     else
-      puts "AUTHENTICATION ALREADY EXISTS".red
+      puts "AUTHENTICATION ALREADY EXISTS"
       already_exists = true
     end
  
@@ -35,9 +35,9 @@ class SessionsController < ApplicationController
         # this user. So let's display an error message.
         flash[:notive] = "You have already linked this account"
 
-        # redirect_back_or root_path #alterei
+        # redirect_to root_path #alterei
         respond_to do |format|
-          format.html { redirect_back_or root_path }
+          format.html { redirect_to root_path }
           format.json { render json: current_user }
         end
       else
@@ -65,7 +65,7 @@ class SessionsController < ApplicationController
         respond_to do |format|
           #redirect back ás vezes é um problema, para protected post actions, depois tenta get
           #tou na ideia k já tinha tratado disto algures para paypal, vê o simplestarter
-          format.html { redirect_back_or root_path } 
+          format.html { redirect_to root_path } 
 
           format.json { render json: @authentication.user }
         end
@@ -79,14 +79,14 @@ class SessionsController < ApplicationController
         sign_in(@authentication.user)
         puts "ITS signed in?: #{signed_in?}"
         flash[:notive] = "Signed in!"
-        # redirect_back_or root_path #alterei
+        # redirect_to root_path #alterei
 
         # response.headers['CONTENT_TYPE'] = 'application/json'
         
         respond_to do |format|
           # puts "FORMAT #{format.inspect}"
           format.js { render js: "<script> JSON.stringify(#{@authentication.user}) </script>" }
-          format.html { redirect_back_or root_path }
+          format.html { redirect_to root_path }
           format.json { 
             user = @authentication.user
             token = user.generate_auth_token
@@ -146,11 +146,11 @@ class SessionsController < ApplicationController
         #   puts "TOKEN #{token}"
         #   redirect_to edit_password_reset_url(token)
         # else
-        #   redirect_back_or root_path
+        #   redirect_to root_path
         # end
-        # redirect_back_or root_path #alterei
+        # redirect_to root_path #alterei
         respond_to do |format|
-          format.html { redirect_back_or root_path }
+          format.html { redirect_to root_path }
           format.json { render json: true }
         end
         # Se for outro provider que n identity tenho de gerar password e redirect
@@ -179,19 +179,8 @@ class SessionsController < ApplicationController
   end
 
 
-  def double_identity
-    puts "REQUEST ENV #{request.env['omniauth.auth']}"
-    puts ""
-    if request.env['omniauth.auth']['provider']=='identity' and signed_in? and current_user.has_identity?
-      # redirect_to root_url 
-      respond_to do |format|
-          format.html { redirect_to root_url }
-          format.json { render json: false }
-      end
-    end
-    #se auth provider == identity and 
-    #signed_in and curent_user has onde identity already ->false
-    #redirect to ..
+  def dont_relogin
+   redirect_to root_path unless !signed_in?
   end
 
 

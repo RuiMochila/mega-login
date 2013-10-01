@@ -13,9 +13,11 @@ MegaLogin::Application.routes.draw do
   
   match '/login', to: 'sessions#new'
   match '/logout', to: 'sessions#destroy'
+
   resources :users #needed by omniauth-identity
 
   root :to => 'users#index'
+  
   resources :password_resets
   # The priority is based upon order of creation:
   # first created -> highest priority.
